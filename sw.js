@@ -1,18 +1,19 @@
-const CACHE_NAME = 'ozz-test-v2'; // Обновил версию
+const CACHE_NAME = 'ozz-test-v3'; // Увеличил версию
 const ASSETS = [
-  './',
   './index.html',
   './manifest.json',
-  './icon.png' // Добавил иконку в кэш (обязательно добавь файл в репозиторий)
+  './icon.png' 
+  // ВАЖНО: Если у вас есть папка images, не добавляйте её целиком сюда, 
+  // Service Worker не умеет сканировать папки. Кэшируйте картинки по мере запроса (см. fetch ниже).
 ];
 
 // Установка
 self.addEventListener('install', (e) => {
-  // Заставляем SW активироваться немедленно
   self.skipWaiting();
-  
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
+      // Используем addAll, но если какого-то файла нет, SW не установится.
+      // Убедитесь, что icon.png существует!
       return cache.addAll(ASSETS);
     })
   );
@@ -20,10 +21,7 @@ self.addEventListener('install', (e) => {
 
 // Активация
 self.addEventListener('activate', (e) => {
-  // Заставляем SW немедленно взять контроль над всеми вкладками
   e.waitUntil(self.clients.claim());
-  
-  // Очистка старого кэша при смене версии
   e.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
@@ -33,11 +31,23 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Fetch (Оффлайн режим)
+// Перехват запросов
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
+      // Если есть в кэше - отдаем
+      if (response) {
+        return response;
+      }
+      // Если нет - качаем из сети
+      return fetch(e.request).then((networkResponse) => {
+        // (Опционально) Можно добавлять просмотренные картинки в кэш динамически:
+        // return caches.open(CACHE_NAME).then((cache) => {
+        //   cache.put(e.request, networkResponse.clone());
+        //   return networkResponse;
+        // });
+        return networkResponse;
+      });
     })
   );
 });
