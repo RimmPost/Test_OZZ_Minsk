@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Тест ОЗЗ (Moodle Style)</title>
-	 <link rel="manifest" href="manifest.json">
-    <style>
+	<!-- Вставьте это после <title> -->
+    <link rel="manifest" href="manifest.json">
+    <!-- Настройки для iOS (iPhone) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Тест ОЗЗ">
+      <style>
         :root {
             --bg-color: #f5f5f5;
             --card-bg: #e6f3f9; /* Светло-голубой как в Moodle */
@@ -2123,5 +2128,14 @@
         }
 
     </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker Registered'))
+        .catch((err) => console.log('SW Failed', err));
+    });
+  }
+</script>	
 </body>
 </html>
