@@ -1,9 +1,11 @@
-const CACHE_NAME = 'ozz-test-v7';
+const CACHE_NAME = 'ozz-test-v9';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.png'
+  './icon.png',
+  './screen-mobile.png',
+  './screen-desktop.png'
 ];
 
 self.addEventListener('install', (e) => {
