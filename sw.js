@@ -1,11 +1,11 @@
-const CACHE_NAME = 'ozz-test-v1';
+const CACHE_NAME = 'ozz-test-v2';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon.png'
 ];
 
-// Установка Service Worker и кэширование
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -14,7 +14,6 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// Активация и получение данных из кэша (Оффлайн режим)
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((response) => {
