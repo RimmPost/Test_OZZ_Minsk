@@ -24,7 +24,6 @@
             --wrong-border: #ebccd1;
             --wrong-text: #a94442;
             --missed-border: #3c763d; /* Жирная зеленая рамка */
-            --yellow-note: #fcf8e3;
             --btn-blue: #007bff;
             --btn-orange: #fd7e14;
         }
@@ -202,16 +201,6 @@
             font-weight: 500;
         }
 
-        .feedback-block {
-            background-color: var(--yellow-note);
-            border: 1px solid #faebcc;
-            color: #8a6d3b;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            display: none;
-        }
-
         /* Bottom Bar */
         .bottom-bar {
             position: fixed;
@@ -251,11 +240,14 @@
             background-color: rgba(0,0,0,0.9);
             justify-content: center;
             align-items: center;
+            overflow: hidden; /* Prevent scrolling when rotated */
         }
         .modal-content {
+            /* Базовые стили, будут перезаписаны JS при повороте */
             max-width: 95%;
             max-height: 90%;
             object-fit: contain;
+            transition: transform 0.3s ease;
         }
         .close-modal {
             position: absolute;
@@ -265,6 +257,7 @@
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
+            z-index: 101; /* Above image */
         }
 
     </style>
@@ -308,7 +301,6 @@
 
     <script>
         // --- DATA ---
-        // Parsed from the provided text
         const rawData = [
   {
     "id": 1,
@@ -2009,17 +2001,11 @@
                 card.appendChild(qHint);
                 card.appendChild(optionsDiv);
 
-                // Feedback block (hidden initially)
-                const feedback = document.createElement('div');
-                feedback.className = 'feedback-block';
-                feedback.id = 'feedback-block';
-                
-                // Construct correct answer text
-                const correctText = q.a.filter(o => o.c).map(o => o.t).join('; ');
-                feedback.innerHTML = `<strong>Правильный ответ:</strong> ${correctText}`;
+                // --- УБРАНО СОЗДАНИЕ БЛОКА С ПРАВИЛЬНЫМ ОТВЕТОМ ---
+                // const feedback = document.createElement('div'); ...
 
                 container.appendChild(card);
-                container.appendChild(feedback);
+                // container.appendChild(feedback); // Убрано
 
             } catch (e) {
                 alert("Ошибка отображения вопроса: " + e.message);
@@ -2067,8 +2053,8 @@
                     // For now, we allow checking even if empty (counts as wrong)
                 }
 
-                // Show feedback block
-                document.getElementById('feedback-block').style.display = 'block';
+                // --- УБРАНО ОТОБРАЖЕНИЕ БЛОКА С ПРАВИЛЬНЫМ ОТВЕТОМ ---
+                // document.getElementById('feedback-block').style.display = 'block';
 
                 // Change button
                 const btn = document.getElementById('main-btn');
@@ -2116,6 +2102,26 @@
             // Path logic: images/{id}.png
             img.src = `images/${q.id}.png`;
             
+            // Сброс стилей перед проверкой ориентации
+            img.style.transform = 'none';
+            img.style.width = '';
+            img.style.height = '';
+            img.style.maxWidth = '95%';
+            img.style.maxHeight = '90%';
+
+            // Проверка ориентации устройства (высота больше ширины = портретный режим)
+            if (window.innerHeight > window.innerWidth) {
+                // Принудительный поворот на 90 градусов
+                img.style.transform = 'rotate(90deg)';
+                
+                // При повороте ширина картинки должна вписываться в высоту экрана
+                img.style.width = (window.innerHeight * 0.9) + 'px';
+                
+                // А высота картинки должна вписываться в ширину экрана
+                img.style.maxWidth = 'none'; // Сбрасываем стандартное ограничение
+                img.style.maxHeight = (window.innerWidth * 0.9) + 'px';
+            }
+
             // Error handling if image doesn't exist
             img.onerror = function() {
                 alert("Изображение не найдено (images/" + q.id + ".png)");
