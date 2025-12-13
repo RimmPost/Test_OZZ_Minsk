@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<!-- Цвет шапки браузера в Android -->
-<meta name="theme-color" content="#007bff">
+    <meta name="theme-color" content="#007bff">
     <title>Тест ОЗЗ (Moodle Style)</title>
-	<!-- Вставьте это после <title> -->
     <link rel="manifest" href="manifest.json">
-    <!-- Настройки для iOS (iPhone) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Тест ОЗЗ">
-      <style>
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <style>
         :root {
-            --bg-color: #f5f5f5;
-            --card-bg: #e6f3f9; /* Светло-голубой как в Moodle */
+            --bg-color: #f0f2f5;
+            --card-bg: #e6f3f9;
             --text-color: #333;
             --correct-bg: #dff0d8;
             --correct-border: #d6e9c6;
@@ -23,9 +22,10 @@
             --wrong-bg: #f2dede;
             --wrong-border: #ebccd1;
             --wrong-text: #a94442;
-            --missed-border: #3c763d; /* Жирная зеленая рамка */
+            --missed-border: #3c763d;
             --btn-blue: #007bff;
             --btn-orange: #fd7e14;
+            --btn-green: #28a745;
         }
 
         body {
@@ -45,86 +45,85 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
         }
 
-        h1 { text-align: center; margin-bottom: 30px; font-size: 1.5rem; }
+        #menu-screen h1 {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
 
         .menu-btn {
             background-color: white;
-            border: 1px solid #ccc;
-            padding: 15px 30px;
+            color: #0056b3;
+            border: none;
+            padding: 18px 25px;
             margin: 10px;
             width: 100%;
-            max-width: 350px; /* Чуть шире для длинных названий */
+            max-width: 380px;
             font-size: 1.1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-weight: bold;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: all 0.2s ease;
         }
-        .menu-btn:active { transform: scale(0.98); }
+        .menu-btn:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         /* --- QUIZ SCREEN --- */
-        #quiz-screen {
+        #quiz-screen, #results-screen {
             display: none;
             flex-direction: column;
             height: 100vh;
         }
 
-        /* Header */
         .top-bar {
             background: white;
-            padding: 10px;
+            padding: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             z-index: 10;
         }
 
         .nav-controls {
             display: flex;
-            gap: 5px;
+            gap: 10px;
             align-items: center;
         }
 
-        .nav-input {
-            width: 40px;
-            padding: 5px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .go-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        /* Стили для кнопок навигации (стрелки) */
+        /* Крупные стрелки */
         .nav-arrow-btn {
             background: #f8f9fa;
             border: 1px solid #ccc;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 16px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 24px;
             font-weight: bold;
+            color: var(--btn-blue);
             cursor: pointer;
         }
         .nav-arrow-btn:active { background: #e2e6ea; }
 
-        .exit-btn {
-            background: none;
+        .nav-input {
+            width: 50px;
+            padding: 8px;
+            font-size: 16px;
             border: 1px solid #ccc;
-            padding: 5px 10px;
-            border-radius: 4px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .go-btn, .exit-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
             font-size: 14px;
-            margin-left: 5px;
         }
 
         /* Content Area */
@@ -132,146 +131,92 @@
             flex: 1;
             overflow-y: auto;
             padding: 15px;
-            padding-bottom: 80px; /* Space for bottom bar */
+            padding-bottom: 100px;
         }
 
         .question-card {
             background-color: var(--card-bg);
             border: 1px solid #bce8f1;
-            border-radius: 5px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 20px;
             margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .q-text {
-            font-weight: 500;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
+        .q-text { font-weight: bold; font-size: 1.15rem; margin-bottom: 15px; line-height: 1.4; }
+        .q-type-hint { font-size: 0.9rem; color: #666; margin-bottom: 15px; font-style: italic; }
 
-        .q-type-hint {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 10px;
-            font-style: italic;
-        }
-
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
 
         .option-label {
             display: flex;
             align-items: flex-start;
             background: white;
-            padding: 12px;
-            border-radius: 4px;
+            padding: 15px;
+            border-radius: 8px;
             border: 1px solid #ddd;
             cursor: pointer;
-            position: relative;
         }
 
-        .option-input {
-            margin-top: 4px;
-            margin-right: 10px;
-            transform: scale(1.3);
-        }
-
-        .option-text {
-            flex: 1;
-            line-height: 1.3;
-        }
-
-        .status-icon {
-            margin-left: 8px;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
+        .option-input { margin-top: 4px; margin-right: 12px; transform: scale(1.4); }
+        .option-text { flex: 1; line-height: 1.4; font-size: 1rem; }
 
         /* Feedback Styles */
-        .option-label.correct {
-            background-color: var(--correct-bg);
-            border-color: var(--correct-border);
-            color: var(--correct-text);
-        }
-        
-        .option-label.wrong {
-            background-color: var(--wrong-bg);
-            border-color: var(--wrong-border);
-            color: var(--wrong-text);
-        }
-
-        /* Missed correct answer style */
-        .option-label.missed {
-            background-color: white;
-            border: 3px solid var(--missed-border);
-        }
-        .option-label.missed .option-text {
-            color: var(--correct-text);
-            font-weight: 500;
-        }
+        .option-label.correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-text); }
+        .option-label.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-text); }
+        .option-label.missed { border: 3px solid var(--missed-border); }
 
         /* Bottom Bar */
         .bottom-bar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             background: white;
-            padding: 10px 15px;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             display: flex;
             gap: 10px;
         }
 
         .action-btn {
             flex: 1;
-            padding: 12px;
+            padding: 15px;
             border: none;
-            border-radius: 5px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
             font-weight: bold;
             color: white;
             cursor: pointer;
         }
-
         .btn-check { background-color: var(--btn-blue); }
-        .btn-img { background-color: var(--btn-orange); flex: 0 0 40%; }
+        .btn-img { background-color: var(--btn-orange); flex: 0 0 35%; }
+
+        /* --- RESULTS SCREEN --- */
+        .results-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .stat-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-item { font-size: 1.2rem; margin: 10px 0; }
+        .stat-value { font-weight: bold; font-size: 1.5rem; }
+        .text-correct { color: var(--correct-text); }
+        .text-wrong { color: var(--wrong-text); }
 
         /* Modal */
         .modal {
             display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; z-index: 100;
+            left: 0; top: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.9);
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* Prevent scrolling when rotated */
+            justify-content: center; align-items: center;
         }
-        .modal-content {
-            /* Базовые стили, будут перезаписаны JS при повороте */
-            max-width: 95%;
-            max-height: 90%;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-        }
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 101; /* Above image */
-        }
+        .modal-content { max-width: 95%; max-height: 90%; object-fit: contain; }
+        .close-modal { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; }
 
     </style>
 </head>
@@ -280,11 +225,10 @@
     <!-- MENU -->
     <div id="menu-screen">
         <h1>Тест ОЗЗ</h1>
-        <!-- Обновленные кнопки меню -->
-        <button class="menu-btn" onclick="startQuiz('range', 1, 152)">ОЗЗ 1-152 (152 вопроса)</button>
-        <button class="menu-btn" onclick="startQuiz('range', 153, 390)">Управление 153-390 (232 вопроса)</button>
-        <button class="menu-btn" onclick="startQuiz('range', 391, 520)">Экономика 391-520 (130 вопросов)</button>
-        <button class="menu-btn" onclick="startQuiz('range', 521, 700)">Организация 521-700 (180 вопросов)</button>
+        <button class="menu-btn" onclick="startQuiz('range', 1, 152)">ОЗЗ 1-152</button>
+        <button class="menu-btn" onclick="startQuiz('range', 153, 390)">Управление 153-390</button>
+        <button class="menu-btn" onclick="startQuiz('range', 391, 520)">Экономика 391-520</button>
+        <button class="menu-btn" onclick="startQuiz('range', 521, 700)">Организация 521-700</button>
         <button class="menu-btn" onclick="startQuiz('50')">Случайные 50</button>
     </div>
 
@@ -292,24 +236,45 @@
     <div id="quiz-screen">
         <div class="top-bar">
             <div class="nav-controls">
-                <!-- Добавлены кнопки Назад/Вперед -->
                 <button class="nav-arrow-btn" onclick="prevQuestion()">&#8592;</button>
-                <span id="counter">1/152</span>
+                <span id="counter" style="font-weight:bold; min-width: 50px; text-align: center;">1/5</span>
                 <button class="nav-arrow-btn" onclick="nextQuestionManual()">&#8594;</button>
-                
                 <input type="number" id="goto-input" class="nav-input" placeholder="#">
                 <button class="go-btn" onclick="goToQuestion()">Go</button>
             </div>
             <button class="exit-btn" onclick="showMenu()">Выход</button>
         </div>
 
-        <div class="content-area" id="question-container">
-            <!-- Question rendered here -->
-        </div>
+        <div class="content-area" id="question-container"></div>
 
         <div class="bottom-bar">
-            <button class="action-btn btn-img" onclick="showImage()">📷 Оригинал</button>
+            <button class="action-btn btn-img" onclick="showImage()">📷 Фото</button>
             <button class="action-btn btn-check" id="main-btn" onclick="handleMainButton()">Проверить</button>
+        </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results-screen">
+        <div class="top-bar">
+            <span style="font-weight: bold; font-size: 1.2rem; margin-left: 10px;">Результаты</span>
+            <button class="exit-btn" onclick="showMenu()">В меню</button>
+        </div>
+        <div class="content-area">
+            <div class="results-container">
+                <div class="stat-box">
+                    <div class="stat-item">Всего вопросов: <span id="res-total" class="stat-value">0</span></div>
+                    <div class="stat-item">Правильно: <span id="res-correct" class="stat-value text-correct">0</span></div>
+                    <div class="stat-item">Ошибок: <span id="res-wrong" class="stat-value text-wrong">0</span></div>
+                    <div class="stat-item">Результат: <span id="res-percent" class="stat-value">0%</span></div>
+                </div>
+                
+                <button id="retry-errors-btn" class="menu-btn" style="background-color: var(--btn-orange); color: white; display: none;" onclick="retryIncorrect()">
+                    Повторить неправильные
+                </button>
+                <button class="menu-btn" style="background-color: var(--btn-blue); color: white;" onclick="showMenu()">
+                    Вернуться в главное меню
+                </button>
+            </div>
         </div>
     </div>
 
@@ -322,69 +287,12 @@
     <script>
         // --- DATA ---
         const rawData = [
-  {
-    "id": 1,
-    "q": "Цель деятельности здравоохранения Республики Беларусь как отрасли деятельности государства:",
-    "a": [
-      { "t": "организация и обеспечение доступного медицинского обслуживания населения", "c": true },
-      { "t": "сохранение и улучшение здоровья людей, увеличение их активного долголетия", "c": false },
-      { "t": "сохранение и укрепление здоровья людей, а также сокращение прямых и косвенных потерь общества за счет снижения заболеваемости и смертности населения", "c": false },
-      { "t": "сокращение сроков восстановления утраченного здоровья населения путем внедрения в медицинскую практику современных методов профилактики, диагностики и лечения", "c": false }
-    ]
-  },
-  {
-    "id": 2,
-    "q": "К основным принципам государственной политики в области здравоохранения относятся:",
-    "a": [
-      { "t": "ответственность нанимателей за состояние здоровья работников", "c": true },
-      { "t": "приоритетность мер профилактической направленности", "c": true },
-      { "t": "создание соответствующей нормативной базы", "c": false },
-      { "t": "создание условий для сохранения, укрепления и восстановления здоровья населения", "c": true },
-      { "t": "совершенствование материально-технической базы здравоохранения", "c": false },
-      { "t": "участие других министерств и ведомств в сохранении, укреплении и восстановлении здоровья населения", "c": false },
-      { "t": "обеспечение доступности медицинского обслуживания, в том числе лекарственного обеспечения", "c": true }
-    ]
-  },
-  {
-    "id": 3,
-    "q": "К основным принципам государственной политики в области здравоохранения относятся:",
-    "a": [
-      { "t": "ответственность государственных органов, организаций за состояние здоровья населения", "c": true },
-      { "t": "обеспечение санитарно-эпидемиологического благополучия населения", "c": true },
-      { "t": "равная доступность всех видов медицинской помощи для населения", "c": false },
-      { "t": "приоритетность развития первичной медицинской помощи", "c": true },
-      { "t": "формирование ответственного отношения населения к сохранению, укреплению и восстановлению собственного здоровья", "c": true },
-      { "t": "бесплатность основных медицинских услуг для населения", "c": false },
-      { "t": "приоритетность медицинского обслуживания и лекарственного обеспечения несовершеннолетних, женщин во время беременности, родов и в послеродовой период, инвалидов и ветеранов", "c": true }
-    ]
-  },
-  {
-    "id": 4,
-    "q": "Обеспечение прав граждан Республики Беларусь на доступное медицинское обслуживание происходит:",
-    "a": [
-      { "t": "развитием государственно-частного партнерства", "c": false },
-      { "t": "проведением медицинских экспертиз", "c": true },
-      { "t": "доступностью лекарственных средств", "c": true },
-      { "t": "предоставлением медицинской помощи за счет собственных средств, средств юридических лиц и иных источников, не запрещенных законодательством", "c": true },
-      { "t": "предоставлением бесплатной медицинской помощи на основании государственных минимальных социальных стандартов в государственных учреждениях здравоохранения", "c": true },
-      { "t": "осуществлением мер по санитарно-эпидемиологическому благополучию населения", "c": true },
-      { "t": "введением государственного социального заказа в здравоохранение", "c": false }
-    ]
-  },
-  {
-    "id": 5,
-    "q": "Здравоохранение Республики Беларусь включает:",
-    "a": [
-      { "t": "негосударственные организации здравоохранения", "c": true },
-      { "t": "Организации здравоохранения", "c": false },
-      { "t": "индивидуальных предпринимателей, осуществляющих медицинскую, фармацевтическую деятельность", "c": true },
-      { "t": "Главные управления по здравоохранению и Комитет по здравоохранению", "c": false },
-      { "t": "Министерство здравоохранения", "c": false },
-      { "t": "государственную систему здравоохранения", "c": true },
-      { "t": "другие организации, которые наряду с основной деятельностью также осуществляют медицинскую, фармацевтическую деятельность", "c": true }
-    ]
-  },
-  {
+            { "id": 1, "q": "Цель деятельности здравоохранения Республики Беларусь как отрасли деятельности государства:", "a": [{ "t": "организация и обеспечение доступного медицинского обслуживания населения", "c": true }, { "t": "сохранение и улучшение здоровья людей, увеличение их активного долголетия", "c": false }, { "t": "сохранение и укрепление здоровья людей, а также сокращение прямых и косвенных потерь общества за счет снижения заболеваемости и смертности населения", "c": false }, { "t": "сокращение сроков восстановления утраченного здоровья населения путем внедрения в медицинскую практику современных методов профилактики, диагностики и лечения", "c": false }] },
+            { "id": 2, "q": "К основным принципам государственной политики в области здравоохранения относятся:", "a": [{ "t": "ответственность нанимателей за состояние здоровья работников", "c": true }, { "t": "приоритетность мер профилактической направленности", "c": true }, { "t": "создание соответствующей нормативной базы", "c": false }, { "t": "создание условий для сохранения, укрепления и восстановления здоровья населения", "c": true }, { "t": "совершенствование материально-технической базы здравоохранения", "c": false }, { "t": "участие других министерств и ведомств в сохранении, укреплении и восстановлении здоровья населения", "c": false }, { "t": "обеспечение доступности медицинского обслуживания, в том числе лекарственного обеспечения", "c": true }] },
+            { "id": 3, "q": "К основным принципам государственной политики в области здравоохранения относятся:", "a": [{ "t": "ответственность государственных органов, организаций за состояние здоровья населения", "c": true }, { "t": "обеспечение санитарно-эпидемиологического благополучия населения", "c": true }, { "t": "равная доступность всех видов медицинской помощи для населения", "c": false }, { "t": "приоритетность развития первичной медицинской помощи", "c": true }, { "t": "формирование ответственного отношения населения к сохранению, укреплению и восстановлению собственного здоровья", "c": true }, { "t": "бесплатность основных медицинских услуг для населения", "c": false }, { "t": "приоритетность медицинского обслуживания и лекарственного обеспечения несовершеннолетних, женщин во время беременности, родов и в послеродовой период, инвалидов и ветеранов", "c": true }] },
+            { "id": 4, "q": "Обеспечение прав граждан Республики Беларусь на доступное медицинское обслуживание происходит:", "a": [{ "t": "развитием государственно-частного партнерства", "c": false }, { "t": "проведением медицинских экспертиз", "c": true }, { "t": "доступностью лекарственных средств", "c": true }, { "t": "предоставлением медицинской помощи за счет собственных средств, средств юридических лиц и иных источников, не запрещенных законодательством", "c": true }, { "t": "предоставлением бесплатной медицинской помощи на основании государственных минимальных социальных стандартов в государственных учреждениях здравоохранения", "c": true }, { "t": "осуществлением мер по санитарно-эпидемиологическому благополучию населения", "c": true }, { "t": "введением государственного социального заказа в здравоохранение", "c": false }] },
+            { "id": 5, "q": "Здравоохранение Республики Беларусь включает:", "a": [{ "t": "негосударственные организации здравоохранения", "c": true }, { "t": "Организации здравоохранения", "c": false }, { "t": "индивидуальных предпринимателей, осуществляющих медицинскую, фармацевтическую деятельность", "c": true }, { "t": "Главные управления по здравоохранению и Комитет по здравоохранению", "c": false }, { "t": "Министерство здравоохранения", "c": false }, { "t": "государственную систему здравоохранения", "c": true }, { "t": "другие организации, которые наряду с основной деятельностью также осуществляют медицинскую, фармацевтическую деятельность", "c": true }] },
+			{
     "id": 6,
     "q": "Медицинская помощь - комплекс медицинских услуг, включающий:",
     "a": [
@@ -7415,51 +7323,182 @@
       { "t": "мониторинг и снижение смертности на участке", "c": false }
     ]
   }
-];
+        ];
 
         // --- APP STATE ---
         let currentQuestions = [];
         let currentIndex = 0;
         let isChecked = false;
+        let userResults = {}; // Храним результаты: { questionId: isCorrect }
 
-        // --- FUNCTIONS ---
-
-        // Обновленная функция запуска с поддержкой диапазонов
         function startQuiz(mode, startId, endId) {
-            try {
-                // Clone data
-                let qList = [...rawData];
-
-                if (mode === 'range') {
-                    // Фильтруем по ID
-                    qList = qList.filter(q => q.id >= startId && q.id <= endId);
-                    // Сортируем по порядку (на случай если в rawData они вразнобой)
-                    qList.sort((a, b) => a.id - b.id);
-                } else if (mode === '50') {
-                    qList = shuffleArray(qList).slice(0, 50);
-                }
-
-                // Проверка на случай, если вопросы еще не добавлены
-                if (qList.length === 0) {
-                    alert("Вопросы в этом диапазоне пока не добавлены в базу.");
-                    return;
-                }
-
-                currentQuestions = qList;
-                currentIndex = 0;
-                isChecked = false;
-
-                document.getElementById('menu-screen').style.display = 'none';
-                document.getElementById('quiz-screen').style.display = 'flex';
-                
-                renderQuestion();
-            } catch (e) {
-                alert("Ошибка запуска: " + e.message);
+            let qList = [...rawData];
+            if (mode === 'range') {
+                qList = qList.filter(q => q.id >= startId && q.id <= endId).sort((a, b) => a.id - b.id);
+            } else if (mode === '50') {
+                qList = shuffleArray(qList).slice(0, 50);
             }
+
+            if (qList.length === 0) { alert("Вопросы не найдены."); return; }
+
+            currentQuestions = qList;
+            currentIndex = 0;
+            isChecked = false;
+            userResults = {}; 
+
+            document.getElementById('menu-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'flex';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('question-container');
+            container.innerHTML = '';
+            isChecked = false;
+            
+            const q = currentQuestions[currentIndex];
+            document.getElementById('counter').innerText = `${currentIndex + 1}/${currentQuestions.length}`;
+            
+            const mainBtn = document.getElementById('main-btn');
+            mainBtn.innerText = "Проверить";
+            mainBtn.style.backgroundColor = "var(--btn-blue)";
+
+            const correctCount = q.a.filter(opt => opt.c).length;
+            const isMultiple = correctCount > 1;
+            
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.innerHTML = `
+                <div class="q-text">Вопрос ${q.id}: ${q.q}</div>
+                <div class="q-type-hint">${isMultiple ? 'Выберите один или несколько ответов:' : 'Выберите один ответ:'}</div>
+                <div class="options-list"></div>
+            `;
+
+            const optionsDiv = card.querySelector('.options-list');
+            q.a.forEach((opt, idx) => {
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                label.dataset.correct = opt.c;
+                label.innerHTML = `
+                    <input type="${isMultiple ? 'checkbox' : 'radio'}" name="q_option" class="option-input" value="${idx}">
+                    <span class="option-text">${opt.t}</span>
+                `;
+                optionsDiv.appendChild(label);
+            });
+
+            container.appendChild(card);
+            container.scrollTop = 0;
+        }
+
+        function handleMainButton() {
+            if (!isChecked) checkAnswer();
+            else nextQuestion();
+        }
+
+        function checkAnswer() {
+            const labels = document.querySelectorAll('.option-label');
+            let isCorrect = true;
+            let anySelected = false;
+
+            labels.forEach(label => {
+                const input = label.querySelector('input');
+                const shouldBeCorrect = label.dataset.correct === 'true';
+                const isSelected = input.checked;
+
+                if (isSelected) anySelected = true;
+
+                if (isSelected && shouldBeCorrect) {
+                    label.classList.add('correct');
+                    addIcon(label, '✔');
+                } else if (isSelected && !shouldBeCorrect) {
+                    label.classList.add('wrong');
+                    addIcon(label, '✖');
+                    isCorrect = false;
+                } else if (!isSelected && shouldBeCorrect) {
+                    label.classList.add('missed');
+                    addIcon(label, '✔');
+                    isCorrect = false;
+                }
+                input.disabled = true;
+            });
+
+            if (!anySelected) isCorrect = false;
+
+            // Сохраняем результат
+            userResults[currentQuestions[currentIndex].id] = isCorrect;
+
+            const btn = document.getElementById('main-btn');
+            btn.innerText = "Далее";
+            btn.style.backgroundColor = "var(--btn-orange)";
+            isChecked = true;
+        }
+
+        function addIcon(label, symbol) {
+            const icon = document.createElement('span');
+            icon.className = 'status-icon';
+            icon.style.marginLeft = "10px";
+            icon.style.fontWeight = "bold";
+            icon.innerText = symbol;
+            label.appendChild(icon);
+        }
+
+        function nextQuestion() {
+            if (currentIndex < currentQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                showFinalResults();
+            }
+        }
+
+        function showFinalResults() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'flex';
+
+            const total = currentQuestions.length;
+            let correct = 0;
+            currentQuestions.forEach(q => {
+                if (userResults[q.id] === true) correct++;
+            });
+
+            const wrong = total - correct;
+            const percent = Math.round((correct / total) * 100);
+
+            document.getElementById('res-total').innerText = total;
+            document.getElementById('res-correct').innerText = correct;
+            document.getElementById('res-wrong').innerText = wrong;
+            document.getElementById('res-percent').innerText = percent + '%';
+
+            const retryBtn = document.getElementById('retry-errors-btn');
+            retryBtn.style.display = (wrong > 0) ? 'block' : 'none';
+        }
+
+        function retryIncorrect() {
+            // Оставляем только те вопросы, на которые ответили неверно
+            const incorrectList = currentQuestions.filter(q => userResults[q.id] !== true);
+            if (incorrectList.length > 0) {
+                currentQuestions = incorrectList;
+                currentIndex = 0;
+                userResults = {}; 
+                document.getElementById('results-screen').style.display = 'none';
+                document.getElementById('quiz-screen').style.display = 'flex';
+                renderQuestion();
+            }
+        }
+
+        function prevQuestion() { if (currentIndex > 0) { currentIndex--; renderQuestion(); } }
+        function nextQuestionManual() { if (currentIndex < currentQuestions.length - 1) { currentIndex++; renderQuestion(); } }
+
+        function goToQuestion() {
+            const val = parseInt(document.getElementById('goto-input').value);
+            if (val >= 1 && val <= currentQuestions.length) { currentIndex = val - 1; renderQuestion(); }
+            document.getElementById('goto-input').value = '';
         }
 
         function showMenu() {
             document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'none';
             document.getElementById('menu-screen').style.display = 'flex';
         }
 
@@ -7471,216 +7510,22 @@
             return array;
         }
 
-        function renderQuestion() {
-            try {
-                const container = document.getElementById('question-container');
-                container.innerHTML = '';
-                isChecked = false;
-                
-                const q = currentQuestions[currentIndex];
-                const total = currentQuestions.length;
-                
-                // Update counter
-                document.getElementById('counter').innerText = `${currentIndex + 1}/${total}`;
-                
-                // Reset button
-                const mainBtn = document.getElementById('main-btn');
-                mainBtn.innerText = "Проверить";
-                mainBtn.classList.add('btn-check');
-                mainBtn.classList.remove('btn-orange'); // just in case
-
-                // Determine type
-                const correctCount = q.a.filter(opt => opt.c).length;
-                const isMultiple = correctCount > 1;
-                const inputType = isMultiple ? 'checkbox' : 'radio';
-                const typeText = isMultiple ? 'Выберите один или несколько ответов:' : 'Выберите один ответ:';
-
-                // Build HTML
-                const card = document.createElement('div');
-                card.className = 'question-card';
-                
-                const qTitle = document.createElement('div');
-                qTitle.className = 'q-text';
-                qTitle.innerHTML = `<strong>Вопрос ${q.id}</strong><br>${q.q}`;
-                
-                const qHint = document.createElement('div');
-                qHint.className = 'q-type-hint';
-                qHint.innerText = typeText;
-
-                const optionsDiv = document.createElement('div');
-                optionsDiv.className = 'options-list';
-
-                q.a.forEach((opt, idx) => {
-                    const label = document.createElement('label');
-                    label.className = 'option-label';
-                    label.dataset.correct = opt.c; // store truth in DOM
-
-                    const input = document.createElement('input');
-                    input.type = inputType;
-                    input.name = 'q_option';
-                    input.className = 'option-input';
-                    input.value = idx;
-
-                    const span = document.createElement('span');
-                    span.className = 'option-text';
-                    span.innerText = opt.t;
-
-                    label.appendChild(input);
-                    label.appendChild(span);
-                    optionsDiv.appendChild(label);
-                });
-
-                card.appendChild(qTitle);
-                card.appendChild(qHint);
-                card.appendChild(optionsDiv);
-
-                container.appendChild(card);
-
-            } catch (e) {
-                alert("Ошибка отображения вопроса: " + e.message);
-            }
-        }
-
-        function handleMainButton() {
-            if (!isChecked) {
-                checkAnswer();
-            } else {
-                nextQuestion();
-            }
-        }
-
-        function checkAnswer() {
-            try {
-                const labels = document.querySelectorAll('.option-label');
-                let anySelected = false;
-
-                labels.forEach(label => {
-                    const input = label.querySelector('input');
-                    const isCorrect = label.dataset.correct === 'true';
-                    const isSelected = input.checked;
-
-                    if (isSelected) anySelected = true;
-
-                    // Disable input
-                    input.disabled = true;
-
-                    // Visual Logic
-                    if (isSelected && isCorrect) {
-                        label.classList.add('correct');
-                        addIcon(label, '✔');
-                    } else if (isSelected && !isCorrect) {
-                        label.classList.add('wrong');
-                        addIcon(label, '✖');
-                    } else if (!isSelected && isCorrect) {
-                        label.classList.add('missed');
-                        addIcon(label, '✔');
-                    }
-                });
-
-                // Change button
-                const btn = document.getElementById('main-btn');
-                btn.innerText = "Далее";
-                isChecked = true;
-
-            } catch (e) {
-                alert("Ошибка проверки: " + e.message);
-            }
-        }
-
-        function addIcon(label, symbol) {
-            const icon = document.createElement('span');
-            icon.className = 'status-icon';
-            icon.innerText = symbol;
-            label.appendChild(icon);
-        }
-
-        function nextQuestion() {
-            if (currentIndex < currentQuestions.length - 1) {
-                currentIndex++;
-                renderQuestion();
-            } else {
-                alert("Тест завершен!");
-                showMenu();
-            }
-        }
-
-        // Новая функция: Ручной переход вперед (без проверки)
-        function nextQuestionManual() {
-            if (currentIndex < currentQuestions.length - 1) {
-                currentIndex++;
-                renderQuestion();
-            }
-        }
-
-        // Новая функция: Ручной переход назад
-        function prevQuestion() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                renderQuestion();
-            }
-        }
-
-        function goToQuestion() {
-            const input = document.getElementById('goto-input');
-            const val = parseInt(input.value);
-            if (!isNaN(val) && val >= 1 && val <= currentQuestions.length) {
-                currentIndex = val - 1;
-                renderQuestion();
-            } else {
-                alert(`Введите число от 1 до ${currentQuestions.length}`);
-            }
-            input.value = '';
-        }
-
-        // --- IMAGE MODAL ---
         function showImage() {
             const q = currentQuestions[currentIndex];
             const img = document.getElementById('modal-img');
-            // Path logic: images/{id}.png
             img.src = `images/${q.id}.png`;
-            
-            // Сброс стилей перед проверкой ориентации
-            img.style.transform = 'none';
-            img.style.width = '';
-            img.style.height = '';
-            img.style.maxWidth = '95%';
-            img.style.maxHeight = '90%';
-
-            // Проверка ориентации устройства (высота больше ширины = портретный режим)
-            if (window.innerHeight > window.innerWidth) {
-                // Принудительный поворот на 90 градусов
-                img.style.transform = 'rotate(90deg)';
-                
-                // При повороте ширина картинки должна вписываться в высоту экрана
-                img.style.width = (window.innerHeight * 0.9) + 'px';
-                
-                // А высота картинки должна вписываться в ширину экрана
-                img.style.maxWidth = 'none'; // Сбрасываем стандартное ограничение
-                img.style.maxHeight = (window.innerWidth * 0.9) + 'px';
-            }
-
-            // Error handling if image doesn't exist
-            img.onerror = function() {
-                alert("Изображение не найдено (images/" + q.id + ".png)");
-                closeModal();
-            };
-
+            img.onerror = () => alert("Фото не найдено.");
             document.getElementById('image-modal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('image-modal').style.display = 'none';
-        }
-
+        function closeModal() { document.getElementById('image-modal').style.display = 'none'; }
     </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log('Service Worker Registered'))
-        .catch((err) => console.log('SW Failed', err));
-    });
-  }
-</script>	
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error', err));
+        });
+      }
+    </script>
 </body>
 </html>
