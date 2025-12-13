@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ozz-test-v12';
+const CACHE_NAME = 'ozz-test-v13';
 const ASSETS = [
   './',
   './index.html',
@@ -8,20 +8,15 @@ const ASSETS = [
   './screen-desktop.png'
 ];
 
-// Установка Service Worker
 self.addEventListener('install', (e) => {
-  // Заставляет ждать активации немедленно
   self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Если какого-то файла нет на сервере, установка может сломаться.
-      // Мы используем addAll, чтобы закэшировать основные файлы.
       return cache.addAll(ASSETS);
     })
   );
 });
 
-// Активация и удаление старого кэша
 self.addEventListener('activate', (e) => {
   e.waitUntil(self.clients.claim());
   e.waitUntil(
@@ -33,11 +28,19 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Перехват запросов (работа офлайн)
 self.addEventListener('fetch', (e) => {
+  // Игнорируем запросы, которые не идут по HTTP/HTTPS (например, расширения Chrome, AdGuard)
+  if (!e.request.url.startsWith('http')) {
+    return;
+  }
+
   e.respondWith(
     caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
+      // Возвращаем кэш или делаем запрос в сеть.
+      // Если сеть падает (из-за AdGuard), просто ничего не возвращаем, чтобы не крашить SW.
+      return response || fetch(e.request).catch(() => {
+          // Ошибка сети или блокировка
+      });
     })
   );
 });

@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#007bff">
     <title>Тест ОЗЗ (Moodle Style)</title>
+    
     <link rel="manifest" href="manifest.json">
+    
+    <!-- Исправление предупреждения deprecated -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Тест ОЗЗ">
+    
     <link rel="icon" type="image/png" href="icon.png">
 
     <style>
@@ -95,7 +100,6 @@
             align-items: center;
         }
 
-        /* Крупные стрелки */
         .nav-arrow-btn {
             background: #f8f9fa;
             border: 1px solid #ccc;
@@ -161,12 +165,10 @@
         .option-input { margin-top: 4px; margin-right: 12px; transform: scale(1.4); }
         .option-text { flex: 1; line-height: 1.4; font-size: 1rem; }
 
-        /* Feedback Styles */
         .option-label.correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-text); }
         .option-label.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-text); }
         .option-label.missed { border: 3px solid var(--missed-border); }
 
-        /* Bottom Bar */
         .bottom-bar {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -191,10 +193,7 @@
         .btn-img { background-color: var(--btn-orange); flex: 0 0 35%; }
 
         /* --- RESULTS SCREEN --- */
-        .results-container {
-            text-align: center;
-            padding: 40px 20px;
-        }
+        .results-container { text-align: center; padding: 40px 20px; }
         .stat-box {
             background: white;
             padding: 25px;
@@ -212,11 +211,15 @@
             display: none;
             position: fixed; z-index: 100;
             left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.9);
+            background-color: rgba(0,0,0,0.95);
             justify-content: center; align-items: center;
+            overflow: hidden;
         }
-        .modal-content { max-width: 95%; max-height: 90%; object-fit: contain; }
-        .close-modal { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; }
+        .modal-content {
+            transition: transform 0.3s ease;
+            object-fit: contain;
+        }
+        .close-modal { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 101; }
 
     </style>
 </head>
@@ -7325,11 +7328,10 @@
   }
         ];
 
-        // --- APP STATE ---
         let currentQuestions = [];
         let currentIndex = 0;
         let isChecked = false;
-        let userResults = {}; // Храним результаты: { questionId: isCorrect }
+        let userResults = {}; 
 
         function startQuiz(mode, startId, endId) {
             let qList = [...rawData];
@@ -7424,8 +7426,6 @@
             });
 
             if (!anySelected) isCorrect = false;
-
-            // Сохраняем результат
             userResults[currentQuestions[currentIndex].id] = isCorrect;
 
             const btn = document.getElementById('main-btn');
@@ -7475,7 +7475,6 @@
         }
 
         function retryIncorrect() {
-            // Оставляем только те вопросы, на которые ответили неверно
             const incorrectList = currentQuestions.filter(q => userResults[q.id] !== true);
             if (incorrectList.length > 0) {
                 currentQuestions = incorrectList;
@@ -7510,11 +7509,36 @@
             return array;
         }
 
+        // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТОБРАЖЕНИЯ ФОТО ---
         function showImage() {
             const q = currentQuestions[currentIndex];
             const img = document.getElementById('modal-img');
+            
+            // Сброс стилей
+            img.style.transform = 'none';
+            img.style.width = 'auto';
+            img.style.height = 'auto';
+            img.style.maxWidth = '95%';
+            img.style.maxHeight = '90%';
+
             img.src = `images/${q.id}.png`;
-            img.onerror = () => alert("Фото не найдено.");
+            
+            img.onload = function() {
+                // Если экран вертикальный (телефон) - поворачиваем
+                if (window.innerHeight > window.innerWidth) {
+                    img.style.transform = 'rotate(90deg)';
+                    // Меняем размеры местами, чтобы влезло
+                    img.style.width = (window.innerHeight * 0.8) + 'px';
+                    img.style.maxWidth = 'none';
+                    img.style.maxHeight = (window.innerWidth * 0.9) + 'px';
+                }
+            };
+
+            img.onerror = () => {
+                alert("Фото не найдено (images/" + q.id + ".png)");
+                closeModal();
+            };
+            
             document.getElementById('image-modal').style.display = 'flex';
         }
 
