@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ozz-test-v13';
+const CACHE_NAME = 'ozz-test-v14';
 const ASSETS = [
   './',
   './index.html',
