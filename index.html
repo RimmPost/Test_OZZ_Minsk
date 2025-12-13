@@ -8,7 +8,6 @@
     
     <link rel="manifest" href="manifest.json">
     
-    <!-- Исправление предупреждения deprecated -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -76,6 +75,14 @@
             transition: all 0.2s ease;
         }
         .menu-btn:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
+        /* Кнопка установки (скрыта по умолчанию) */
+        #install-btn {
+            display: none; 
+            background-color: #28a745; /* Зеленая */
+            color: white;
+            margin-top: 20px;
+        }
 
         /* --- QUIZ SCREEN --- */
         #quiz-screen, #results-screen {
@@ -228,6 +235,9 @@
     <!-- MENU -->
     <div id="menu-screen">
         <h1>Тест ОЗЗ</h1>
+        <!-- КНОПКА УСТАНОВКИ (появится автоматически) -->
+        <button id="install-btn" class="menu-btn">⬇ Установить приложение</button>
+
         <button class="menu-btn" onclick="startQuiz('range', 1, 152)">ОЗЗ 1-152</button>
         <button class="menu-btn" onclick="startQuiz('range', 153, 390)">Управление 153-390</button>
         <button class="menu-btn" onclick="startQuiz('range', 391, 520)">Экономика 391-520</button>
@@ -7509,12 +7519,10 @@
             return array;
         }
 
-        // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТОБРАЖЕНИЯ ФОТО ---
         function showImage() {
             const q = currentQuestions[currentIndex];
             const img = document.getElementById('modal-img');
             
-            // Сброс стилей
             img.style.transform = 'none';
             img.style.width = 'auto';
             img.style.height = 'auto';
@@ -7524,10 +7532,8 @@
             img.src = `images/${q.id}.png`;
             
             img.onload = function() {
-                // Если экран вертикальный (телефон) - поворачиваем
                 if (window.innerHeight > window.innerWidth) {
                     img.style.transform = 'rotate(90deg)';
-                    // Меняем размеры местами, чтобы влезло
                     img.style.width = (window.innerHeight * 0.8) + 'px';
                     img.style.maxWidth = 'none';
                     img.style.maxHeight = (window.innerWidth * 0.9) + 'px';
@@ -7544,12 +7550,49 @@
 
         function closeModal() { document.getElementById('image-modal').style.display = 'none'; }
     </script>
+    
+    <!-- ЛОГИКА УСТАНОВКИ PWA -->
     <script>
+      let deferredPrompt;
+      const installBtn = document.getElementById('install-btn');
+
+      // 1. Регистрируем SW
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error', err));
         });
       }
+
+      // 2. Ловим событие "можно установить"
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Отменяем стандартный баннер (он часто не работает сам)
+        e.preventDefault();
+        // Сохраняем событие
+        deferredPrompt = e;
+        // Показываем нашу кнопку
+        installBtn.style.display = 'block';
+      });
+
+      // 3. Обрабатываем клик по кнопке
+      installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          // Показываем системный промпт
+          deferredPrompt.prompt();
+          // Ждем выбора пользователя
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(`User response to the install prompt: ${outcome}`);
+          // Обнуляем событие (оно одноразовое)
+          deferredPrompt = null;
+          // Скрываем кнопку
+          installBtn.style.display = 'none';
+        }
+      });
+
+      // 4. Если приложение уже установлено - скрываем кнопку
+      window.addEventListener('appinstalled', () => {
+        installBtn.style.display = 'none';
+        console.log('PWA was installed');
+      });
     </script>
 </body>
 </html>
